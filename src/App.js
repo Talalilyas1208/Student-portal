@@ -1,17 +1,43 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-import Login from "../Login";
-import { Image } from "antd";
-// import StepTwo from './StepTwo';
-// import StepThree from './StepThree';
+import { ConfigProvider } from "antd";
+import { Provider } from "react-redux";
+import store from "./redux/store";
+import Pagerouting from "./Pagerouting";
+
+const themeConfig = {
+  token: {
+    colorPrimary: "#1677ff",
+    colorInfo: "#1677ff",
+    colorSuccess: "#52c41a",
+    colorWarning: "#fa8c16",
+    colorError: "#ff4d4f",
+    borderRadius: 8,
+    fontFamily:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+  },
+  components: {
+    Button: {
+      borderRadius: 6,
+      controlHeight: 38
+    },
+    Card: {
+      headerFontSize: 15,
+      headerHeight: 48
+    },
+    Table: {
+      headerBg: "#f8faff",
+      headerColor: "#1d39c4"
+    }
+  }
+};
 
 function App() {
   return (
-    <Routes>
-      {<Route path="/" element={<Login />} />}
-      {/* <Route path="/step-2" element={<StepTwo />} />
-      <Route path="/step-3" element={<StepThree />} /> */}
-    </Routes>
+    <Provider store={store}>
+      <ConfigProvider theme={themeConfig}>
+        <Pagerouting />
+      </ConfigProvider>
+    </Provider>
   );
 }
 

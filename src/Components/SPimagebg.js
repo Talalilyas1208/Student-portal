@@ -1,15 +1,31 @@
+import React from "react";
+import { Image } from "antd";
 import bgImage from "../Images/university-background-image.jpg";
 
-import { Image } from "antd";
-
-export default function SPimagebg({ width }) {
+export default function SPimagebg({ width = "100%", height = "100%", style = {} }) {
   return (
-    <Image
-      width={width}
-      height="100%"
-      src={bgImage}
-      preview={false}
-      className="login-bg-image"
-    />
+    <div
+      style={{
+        width: width,
+        height: height,
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        ...style
+      }}
+    >
+      <Image
+        width={width}
+        height={height}
+        src={bgImage}
+        preview={false}
+        style={{
+          objectFit: "cover",
+          borderRadius: "8px"
+        }}
+        className="login-bg-image"
+      />
+    </div>
   );
 }

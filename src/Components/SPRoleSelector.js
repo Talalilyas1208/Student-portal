@@ -1,37 +1,37 @@
 import React from "react";
-import { Row, Col, Radio } from "antd";
-import { Link } from "react-router-dom";
+import { Segmented, Row, Col } from "antd";
+import { UserOutlined, TeamOutlined } from "@ant-design/icons";
 
-const RoleSelector = ({ role, onChange, studentPath = "/studentlogin", lecturerPath = "/Lecturerlogin" }) => {
+const SPRoleSelector = ({ role = "student", onChange, style = {} }) => {
   return (
-    <Row justify="center">
-      <Col xs={24} style={{ display: "flex", justifyContent: "center" }}>
-        <Radio.Group
-          onChange={onChange}
+    <Row justify="center" style={{ margin: "16px 0", ...style }}>
+      <Col>
+        <Segmented
+          size="large"
           value={role}
-          buttonStyle="solid"
-          className="role-selector-group"
-        >
-          <Link to={studentPath}>
-            <Radio.Button
-              value="student"
-              className="role-selector-button role-left"
-            >
-              Student
-            </Radio.Button>
-          </Link>
-          <Link to={lecturerPath}>
-            <Radio.Button
-              value="lecturer"
-              className="role-selector-button role-right"
-            >
-              Lecturer
-            </Radio.Button>
-          </Link>
-        </Radio.Group>
+          onChange={onChange}
+          options={[
+            {
+              label: "Student Portal",
+              value: "student",
+              icon: <UserOutlined />
+            },
+            {
+              label: "Lecturer Portal",
+              value: "lecturer",
+              icon: <TeamOutlined />
+            }
+          ]}
+          style={{
+            padding: "4px",
+            backgroundColor: "#f0f2f5",
+            borderRadius: "8px",
+            fontWeight: 500
+          }}
+        />
       </Col>
     </Row>
   );
 };
 
-export default RoleSelector;
+export default React.memo(SPRoleSelector);

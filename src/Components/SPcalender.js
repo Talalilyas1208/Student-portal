@@ -1,86 +1,106 @@
 import React, { useState } from "react";
-import { Calendar, Radio, Row, Select, theme } from "antd";
+import { Calendar, Badge, Modal, List, Typography, theme } from "antd";
+import dayjs from "dayjs";
+
+const { Text } = Typography;
 
 const SPCalendar = ({
+  events = [],
   fullscreen = false,
   bordered = true,
-  onPanelChange,
-  dateCellRender,
+  onSelectDate,
   wrapperStyle = {},
+  style = {}
 }) => {
   const { token } = theme.useToken();
-  const [calendarValue, setCalendarValue] = useState();
+  const [selectedEventModal, setSelectedEventModal] = useState(null);
 
-  const handlePanelChange = (value, mode) => {
-    setCalendarValue(value);
-    onPanelChange?.(value, mode);
+  const getEventsForDate = (dateVal) => {
+    if (!Array.isArray(events) || events.length === 0) return [];
+    const formatted = dayjs(dateVal).format("YYYY-MM-DD");
+    return events.filter((ev) => ev.date === formatted);
   };
 
-  const defaultStyle = {
+  const cellRender = (current, info) => {
+    if (info.type !== "date") return info.originNode;
+    const dateEvents = getEventsForDate(current);
+    if (!dateEvents.length) return info.originNode;
+
+    return (
+      <div className="ant-picker-cell-inner ant-picker-calendar-date">
+        <div className="ant-picker-calendar-date-value">{current.date()}</div>
+        <div className="ant-picker-calendar-date-content" style={{ marginTop: 2 }}>
+          {dateEvents.slice(0, 2).map((item, idx) => (
+            <div
+              key={idx}
+              style={{
+                fontSize: "11px",
+                lineHeight: "14px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                margin: "1px 0"
+              }}
+            >
+              <Badge status={item.type || "processing"} text={item.content} />
+            </div>
+          ))}
+          {dateEvents.length > 2 && (
+            <Text type="secondary" style={{ fontSize: "10px" }}>
+              +{dateEvents.length - 2} more
+            </Text>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const handleSelect = (date) => {
+    const dateEvents = getEventsForDate(date);
+    if (dateEvents.length > 0 && !fullscreen) {
+      setSelectedEventModal({
+        date: date.format("MMMM D, YYYY"),
+        events: dateEvents
+      });
+    }
+    if (onSelectDate) onSelectDate(date);
+  };
+
+  const containerStyle = {
     width: "100%",
     border: bordered ? `1px solid ${token.colorBorderSecondary}` : "none",
     borderRadius: token.borderRadiusLG,
-    padding: 8,
+    padding: fullscreen ? 16 : 8,
     background: "#ffffff",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
     ...wrapperStyle,
+    ...style
   };
 
   return (
-    <div style={defaultStyle}>
+    <div style={containerStyle}>
       <Calendar
         fullscreen={fullscreen}
-        value={calendarValue}
-        onPanelChange={handlePanelChange}
-        dateCellRender={dateCellRender}
-        headerRender={({ value, type, onChange, onTypeChange }) => {
-          const current = value.clone();
-          const localeData = value.localeData();
-
-          const months = Array.from({ length: 12 }, (_, i) => ({
-            label: localeData.monthsShort(current.month(i)),
-            value: i,
-          }));
-
-          const year = value.year();
-          const yearOptions = Array.from({ length: 120 }, (_, i) => ({
-            label: `${year - 10 + i}`,
-            value: year - 10 + i,
-          }));
-
-          return (
-            <Row gutter={[8, 8]} wrap align="middle" style={{ marginTop: 8 }}>
-              <Radio.Group
-                size="small"
-                onChange={(e) => onTypeChange(e.target.value)}
-                value={type}
-                style={{ display: "flex", gap: 8 }}
-              >
-                <Radio.Button value="month">Month</Radio.Button>
-                <Radio.Button value="yearOptions" >Year</Radio.Button>
-              </Radio.Group>
-
-              <Select
-                size="small"
-                value={year}
-                onChange={(newYear) => onChange(value.clone().year(newYear))}
-                options={yearOptions}
-                style={{ width: 100 }}
-              />
-
-              <Select
-                size="small"
-                value={value.month()}
-                onChange={(newMonth) => onChange(value.clone().month(newMonth))}
-                options={months}
-                style={{ width: 100 }}
-              />
-            </Row>
-          );
-        }}
+        cellRender={cellRender}
+        onSelect={handleSelect}
       />
+      <Modal
+        title={`Events for ${selectedEventModal?.date}`}
+        open={Boolean(selectedEventModal)}
+        onCancel={() => setSelectedEventModal(null)}
+        footer={null}
+      >
+        <List
+          dataSource={selectedEventModal?.events || []}
+          renderItem={(item) => (
+            <List.Item>
+              <Badge status={item.type || "processing"} text={<Text strong>{item.content}</Text>} />
+            </List.Item>
+          )}
+        />
+      </Modal>
     </div>
   );
 };
 
-export default SPCalendar;
+export default React.memo(SPCalendar);

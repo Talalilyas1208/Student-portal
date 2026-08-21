@@ -1,19 +1,57 @@
 import React from "react";
-import { Form, Button } from "antd";
+import { Button, Form } from "antd";
 
+const SPButton = ({
+  text,
+  name,
+  children,
+  shape = "default",
+  type = "primary",
+  size = "middle",
+  loading = false,
+  disabled = false,
+  icon,
+  danger = false,
+  ghost = false,
+  block = true,
+  htmlType = "submit",
+  onClick,
+  style = {},
+  className = "",
+  inFormItem = false
+}) => {
+  const content = children || text || name || "Submit";
 
-const SPButton = (props) =>{
-  
-  const {text,name,shape,type,onClick} = props;
-  return (
-    <Form.Item>
-      <Button  htmlType="submit" block shape={shape} type={type} onClick={onClick} >
-       {text}
-       {name}
-       
-      </Button>
-    </Form.Item>
-  );  
+  const buttonElement = (
+    <Button
+      type={type}
+      shape={shape}
+      size={size}
+      loading={loading}
+      disabled={disabled}
+      icon={icon}
+      danger={danger}
+      ghost={ghost}
+      block={block}
+      htmlType={htmlType}
+      onClick={onClick}
+      style={{
+        fontWeight: 500,
+        borderRadius: shape === "round" ? "20px" : "6px",
+        transition: "all 0.2s ease-in-out",
+        ...style
+      }}
+      className={className}
+    >
+      {content}
+    </Button>
+  );
+
+  if (inFormItem) {
+    return <Form.Item style={{ marginBottom: 0 }}>{buttonElement}</Form.Item>;
+  }
+
+  return buttonElement;
 };
 
-export default SPButton;
+export default React.memo(SPButton);

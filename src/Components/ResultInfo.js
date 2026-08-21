@@ -1,122 +1,153 @@
 import React, { useState } from "react";
-import { Form, Select, Row, Col, Typography } from "antd";
+import { Form, Select, Row, Col, Typography, Card, Space, Tag } from "antd";
 
 const { Text } = Typography;
+
 const ResultInfo = ({ form }) => {
   const [classNumber, setClassNumber] = useState(4);
-  const [resultType, setResultType] = useState("");
-  const [teacherOptions, setTeacherOptions] = useState([]);
+  const [resultType, setResultType] = useState("Final Result");
+  const [teacherOptions, setTeacherOptions] = useState([
+    { value: "Dr. Asad Malik", label: "Dr. Asad Malik (CS)" },
+    { value: "Prof. Ahmad Raza", label: "Prof. Ahmad Raza (Math)" },
+    { value: "Dr. Syed Tanveer", label: "Dr. Syed Tanveer (EE)" }
+  ]);
+
   const classOptions = Array.from({ length: 13 }, (_, i) => ({
-    label: `Class ${i + 4}`,
-    value: i + 4,
+    label: i + 4 <= 12 ? `Grade / Class ${i + 4}` : `Semester ${i - 8} (University)`,
+    value: i + 4
   }));
+
   const handleClassChange = (value) => {
     setClassNumber(value);
-    const newResultType = value <= 12 ? "Final Result" : "Semester Result";
+    const newResultType = value <= 12 ? "School / Intermediate Exam" : "University Semester Exam";
     setResultType(newResultType);
+
     let options = [];
     if (value >= 4 && value <= 6) {
       options = [
-        { value: "Asad", label: "Asad" },
-        { value: "Ahmad", label: "Ahmad" },
-        { value: "Syed", label: "Syed" },
+        { value: "Dr. Asad Malik", label: "Dr. Asad Malik" },
+        { value: "Prof. Ahmad Raza", label: "Prof. Ahmad Raza" },
+        { value: "Dr. Syed Tanveer", label: "Dr. Syed Tanveer" }
       ];
-    } else if (value >= 7 && value <= 8) {
+    } else if (value >= 7 && value <= 10) {
       options = [
-        { value: "Maryam", label: "Maryam" },
-        { value: "Bilal", label: "Bilal" },
-        { value: "Abdullah", label: "Abdullah" },
-      ];
-    } else if (value >= 9 && value <= 10) {
-      options = [
-        { value: "Iqbal", label: "Iqbal" },
-        { value: "Murad", label: "Murad" },
+        { value: "Prof. Maryam Bilal", label: "Prof. Maryam Bilal" },
+        { value: "Dr. Iqbal Murad", label: "Dr. Iqbal Murad" },
+        { value: "Prof. Abdullah", label: "Prof. Abdullah" }
       ];
     } else if (value >= 11 && value <= 12) {
       options = [
-        { value: "Sarfaraz", label: "Sarfaraz" },
-        { value: "Arshad", label: "Arshad" },
+        { value: "Prof. Sarfaraz Arshad", label: "Prof. Sarfaraz Arshad" },
+        { value: "Dr. Ayesha Khan", label: "Dr. Ayesha Khan" }
       ];
-    } else if (value >= 13 && value <= 14) {
+    } else {
       options = [
-        { value: "Ali", label: "Ali" },
-        { value: "Aasad", label: "Aasad" },
+        { value: "Dr. Ali Hamza", label: "Dr. Ali Hamza (Department Head)" },
+        { value: "Prof. Dr. Maryam Bilal", label: "Prof. Dr. Maryam Bilal (Faculty Advisor)" },
+        { value: "Dr. Asad Malik", label: "Dr. Asad Malik (Course Lead)" }
       ];
-    } else if (value >= 15 && value <= 16) {
-      options = [{ value: "Hamza", label: "Hamza" }];
     }
     setTeacherOptions(options);
-    form.setFieldsValue({
-      resultType: newResultType,
-      teacher: undefined,
-      grade: undefined,
-      cgpa: undefined,
-    });
+
+    if (form) {
+      form.setFieldsValue({
+        resultType: newResultType,
+        teacher: undefined,
+        grade: undefined,
+        cgpa: undefined
+      });
+    }
   };
 
   return (
-    <Row gutter={16}>
-      <Col span={10}>
-        <Form.Item
-          label="Enter Class"
-          name="classNumber"
-          rules={[{ required: true, message: "Please select your class!" }]}>
-          <Select
-            placeholder="Select class"
-            options={classOptions}
-            value={classNumber}
-            onChange={handleClassChange}/>
-        </Form.Item>
-      </Col>
-      {classNumber >= 4 && classNumber <= 12 && (
-        <Col span={14}>
+    <Card
+      type="inner"
+      title={<Text strong>Academic Performance & Evaluation</Text>}
+      style={{ marginBottom: 16, borderRadius: "8px" }}
+    >
+      <Row gutter={16}>
+        <Col xs={24} sm={12}>
           <Form.Item
-            label="Grade"
-            name="grade"
-            rules={[{ required: true, message: "Please select your grade!" }]} >
+            label="Class / Semester Level"
+            name="classNumber"
+            initialValue={4}
+            rules={[{ required: true, message: "Please select academic level!" }]}
+          >
             <Select
-              placeholder="Select grade"
-              options={[
-                { value: "A+", label: "A+" },
-                { value: "B", label: "B" },
-                { value: "C", label: "C" },
-              ]}/>
-          </Form.Item>
-        </Col> )}
-      {classNumber >= 13 && (
-        <Col span={14}>
-          <Form.Item
-            label="CGPA"
-            name="cgpa"
-            rules={[{ required: true, message: "Please select your CGPA!" }]} >
-            <Select
-              placeholder="Select CGPA"
-              options={[
-                { value: "4", label: "4" },
-                { value: "3.5", label: "3.5" },
-                { value: "3", label: "3" },
-              ]}
+              placeholder="Select class or semester"
+              options={classOptions}
+              value={classNumber}
+              onChange={handleClassChange}
             />
           </Form.Item>
-        </Col> )}
-      <Col span={11}>
-        <Form.Item label="Result Type" name="resultType">
-          <Text type="secondary">
-            {resultType || "Select class to see result type"}
-          </Text>
-        </Form.Item>
-      </Col>
-      {teacherOptions.length > 0 && (
-        <Col span={13}>
+        </Col>
+
+        {classNumber <= 12 ? (
+          <Col xs={24} sm={12}>
+            <Form.Item
+              label="Obtained Grade"
+              name="grade"
+              rules={[{ required: true, message: "Please select grade!" }]}
+            >
+              <Select
+                placeholder="Select grade"
+                options={[
+                  { value: "A+", label: "A+ (90-100%)" },
+                  { value: "A", label: "A (80-89%)" },
+                  { value: "B+", label: "B+ (70-79%)" },
+                  { value: "B", label: "B (60-69%)" },
+                  { value: "C", label: "C (50-59%)" },
+                  { value: "Pass", label: "Pass (40-49%)" }
+                ]}
+              />
+            </Form.Item>
+          </Col>
+        ) : (
+          <Col xs={24} sm={12}>
+            <Form.Item
+              label="Semester CGPA / GPA"
+              name="cgpa"
+              rules={[{ required: true, message: "Please select CGPA!" }]}
+            >
+              <Select
+                placeholder="Select CGPA"
+                options={[
+                  { value: "4.00", label: "4.00 (Distinction)" },
+                  { value: "3.80", label: "3.80 (High Honors)" },
+                  { value: "3.50", label: "3.50 (Honors)" },
+                  { value: "3.20", label: "3.20 (Good Standing)" },
+                  { value: "3.00", label: "3.00 (Satisfactory)" },
+                  { value: "2.50", label: "2.50 (Pass)" }
+                ]}
+              />
+            </Form.Item>
+          </Col>
+        )}
+      </Row>
+
+      <Row gutter={16}>
+        <Col xs={24} sm={12}>
           <Form.Item
-            label="Teacher"
+            label="Assigned Instructor / Examiner"
             name="teacher"
-            rules={[{ required: true, message: "Please select your teacher!" }]}
+            rules={[{ required: true, message: "Please select instructor!" }]}
           >
-            <Select placeholder="Select teacher" options={teacherOptions} />
+            <Select placeholder="Select instructor" options={teacherOptions} />
           </Form.Item>
-        </Col>)}
-    </Row>
+        </Col>
+
+        <Col xs={24} sm={12}>
+          <Form.Item label="Evaluation Type">
+            <Space orientation="vertical" style={{ width: "100%", paddingTop: 4 }}>
+              <Tag color="geekblue" style={{ fontSize: "12px", padding: "4px 8px" }}>
+                {resultType}
+              </Tag>
+            </Space>
+          </Form.Item>
+        </Col>
+      </Row>
+    </Card>
   );
 };
-export default ResultInfo;
+
+export default React.memo(ResultInfo);

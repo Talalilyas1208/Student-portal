@@ -1,6 +1,15 @@
 import React from "react";
-import { Menu, Row, Col } from "antd";
 import { useNavigate } from "react-router-dom";
+
+// Helper that formats an item object for modern Ant Design 5 Menu items prop
+export const createMenuItem = (key, label, icon, path, onClick) => {
+  return {
+    key: String(key),
+    icon,
+    label,
+    onClick: onClick ? onClick : (navigate) => (path ? navigate(path) : null)
+  };
+};
 
 const SidebarMenuItem = ({ label, icon, path, onClick }) => {
   const navigate = useNavigate();
@@ -11,14 +20,22 @@ const SidebarMenuItem = ({ label, icon, path, onClick }) => {
   };
 
   return (
-    <Row justify="space-around ">
-      <Col span={18}>
-        <Menu.Item key={path } icon={icon} onClick={handleClick}>
-          {label}
-        </Menu.Item>
-      </Col>
-    </Row>
+    <div
+      onClick={handleClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "10px 16px",
+        cursor: "pointer",
+        borderRadius: "6px",
+        transition: "all 0.2s"
+      }}
+    >
+      {icon}
+      <span>{label}</span>
+    </div>
   );
 };
 
-export default SidebarMenuItem;
+export default React.memo(SidebarMenuItem);
